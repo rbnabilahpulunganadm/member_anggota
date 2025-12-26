@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     body { font-family: 'Poppins', sans-serif; background-color: #FFF0F5; color: #333; }
@@ -24,7 +25,7 @@
   <div class="w-full max-w-md bg-white p-4 shadow-sm sticky top-0 z-10 text-center flex items-center justify-center gap-2">
     <div class="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center text-pink-600"><i class="fas fa-heart"></i></div>
     <div>
-        <h1 class="text-lg font-bold text-pink-600 leading-tight">Membership System</h1>
+        <h1 class="text-lg font-bold text-pink-600 leading-tight">Membership & Analisa</h1>
         <p class="text-[10px] text-gray-500">Klinik Nabilah Pulungan</p>
     </div>
   </div>
@@ -35,12 +36,19 @@
     <div id="menu-view">
       <div class="grid grid-cols-2 gap-4">
         <button onclick="switchView('register')" class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1 flex flex-col items-center justify-center gap-2 group">
-          <div class="w-14 h-14 bg-pink-50 rounded-full flex items-center justify-center text-pink-500 text-2xl group-hover:bg-pink-500 group-hover:text-white transition-colors"><i class="fas fa-user-plus"></i></div>
+          <div class="w-12 h-12 bg-pink-50 rounded-full flex items-center justify-center text-pink-500 text-xl group-hover:bg-pink-500 group-hover:text-white transition-colors"><i class="fas fa-user-plus"></i></div>
           <span class="font-semibold text-sm text-gray-700">Daftar Baru</span>
         </button>
         <button onclick="switchView('check')" class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1 flex flex-col items-center justify-center gap-2 group">
-          <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 text-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fas fa-search"></i></div>
-          <span class="font-semibold text-sm text-gray-700">Cek Member</span>
+          <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 text-xl group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fas fa-search"></i></div>
+          <span class="font-semibold text-sm text-gray-700">Cek & Statistik</span>
+        </button>
+        <button onclick="loadAnalytics()" class="col-span-2 bg-white p-4 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1 flex items-center justify-center gap-4 group">
+          <div class="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center text-purple-500 text-lg group-hover:bg-purple-500 group-hover:text-white transition-colors"><i class="fas fa-chart-line"></i></div>
+          <div class="text-left">
+             <span class="font-bold text-sm text-gray-700 block">Analisa Global & Promo</span>
+             <span class="text-[10px] text-gray-400">Lihat Top Member & Tren</span>
+          </div>
         </button>
       </div>
 
@@ -50,7 +58,7 @@
             <h3 class="font-bold text-gray-700 text-sm">Member Terbaru</h3>
             <button onclick="loadRecentMembers()" class="text-xs text-pink-500"><i class="fas fa-sync-alt"></i> Refresh</button>
         </div>
-        <div id="recent-members-list" class="space-y-3 text-sm max-h-80 overflow-y-auto pr-1">
+        <div id="recent-members-list" class="space-y-3 text-sm max-h-60 overflow-y-auto pr-1">
           <div class="text-center text-gray-400 py-4"><div class="loader inline-block"></div> Memuat data...</div>
         </div>
       </div>
@@ -58,257 +66,172 @@
 
     <!-- VIEW: REGISTRASI -->
     <div id="register-view" class="hidden">
-      <button onclick="switchView('menu')" class="mb-4 text-gray-500 hover:text-pink-600 flex items-center gap-1 text-sm font-medium"><i class="fas fa-arrow-left"></i> Kembali ke Menu</button>
-      
+      <button onclick="switchView('menu')" class="mb-4 text-gray-500 hover:text-pink-600 flex items-center gap-1 text-sm font-medium"><i class="fas fa-arrow-left"></i> Kembali</button>
       <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-pink-400">
         <h2 class="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2"><i class="fas fa-file-alt text-pink-500"></i> Form Registrasi</h2>
         <form id="reg-form" onsubmit="handleRegister(event)" class="space-y-4">
-          
           <div class="bg-pink-50 p-3 rounded-lg border border-pink-100">
              <div class="mb-3">
                 <label class="block text-xs font-bold text-gray-600 mb-1 uppercase tracking-wide">Nomor RME <span class="text-red-500">*</span></label>
                 <input type="text" name="rme" required placeholder="NBLH-XXX" class="w-full bg-white border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 font-mono text-lg font-bold uppercase text-gray-700">
              </div>
           </div>
-
-          <div>
-            <label class="block text-xs font-bold text-gray-600 mb-1">Nama Lengkap (Ibu/Wali) <span class="text-red-500">*</span></label>
-            <input type="text" name="nama" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500">
-          </div>
-
+          <div><label class="block text-xs font-bold text-gray-600 mb-1">Nama Ibu/Wali <span class="text-red-500">*</span></label><input type="text" name="nama" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5"></div>
           <div class="grid grid-cols-2 gap-3">
-             <div>
-                <label class="block text-xs font-bold text-gray-600 mb-1">WhatsApp <span class="text-red-500">*</span></label>
-                <input type="tel" name="hp" required placeholder="08..." class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-pink-500">
-             </div>
-             <div>
-                <label class="block text-xs font-bold text-gray-600 mb-1">Instagram</label>
-                <input type="text" name="instagram" placeholder="@username" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-pink-500">
-             </div>
+             <div><label class="block text-xs font-bold text-gray-600 mb-1">WhatsApp <span class="text-red-500">*</span></label><input type="tel" name="hp" required class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5"></div>
+             <div><label class="block text-xs font-bold text-gray-600 mb-1">Instagram</label><input type="text" name="instagram" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5"></div>
           </div>
-
-          <div>
-             <label class="block text-xs font-bold text-gray-600 mb-1">Alamat Domisili</label>
-             <textarea name="alamat" rows="2" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-pink-500"></textarea>
-          </div>
-
+          <div><label class="block text-xs font-bold text-gray-600 mb-1">Alamat</label><textarea name="alamat" rows="2" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5"></textarea></div>
           <hr class="border-dashed border-gray-300 my-2">
-
-          <div>
-            <label class="block text-xs font-bold text-gray-600 mb-1">Nama Baby / Anak</label>
-            <input type="text" name="nama_anak" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-pink-500">
-          </div>
-
+          <div><label class="block text-xs font-bold text-gray-600 mb-1">Nama Anak</label><input type="text" name="nama_anak" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5"></div>
           <div class="grid grid-cols-2 gap-3">
-             <div>
-                <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Lahir</label>
-                <input type="date" name="tgl_lahir" id="tgl_lahir" onchange="hitungUsia()" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-pink-500">
-             </div>
-             <div>
-                <label class="block text-xs font-bold text-gray-600 mb-1">Jenis Kelamin</label>
-                <select name="gender" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-pink-500">
-                   <option value="Perempuan">Perempuan</option>
-                   <option value="Laki-laki">Laki-laki</option>
-                </select>
-             </div>
+             <div><label class="block text-xs font-bold text-gray-600 mb-1">Tgl Lahir</label><input type="date" name="tgl_lahir" id="tgl_lahir" onchange="hitungUsia()" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5"></div>
+             <div><label class="block text-xs font-bold text-gray-600 mb-1">Gender</label><select name="gender" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5"><option value="Perempuan">Perempuan</option><option value="Laki-laki">Laki-laki</option></select></div>
           </div>
-
-          <div>
-            <label class="block text-xs font-bold text-gray-600 mb-1">Usia Saat Ini (Otomatis)</label>
-            <input type="text" id="usia_display" readonly placeholder="Pilih Tgl Lahir dulu..." class="w-full border border-gray-200 rounded-lg p-2.5 input-readonly font-semibold text-gray-500 text-sm">
-          </div>
-
-          <button type="submit" id="btn-submit" class="w-full bg-pink-600 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-pink-700 transition flex justify-center items-center gap-2 mt-4">
-            <span>Simpan Member Baru</span>
-          </button>
+          <div><label class="block text-xs font-bold text-gray-600 mb-1">Usia</label><input type="text" id="usia_display" readonly class="w-full border border-gray-200 rounded-lg p-2.5 input-readonly font-semibold text-gray-500 text-sm"></div>
+          <button type="submit" id="btn-submit" class="w-full bg-pink-600 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-pink-700 transition flex justify-center items-center gap-2 mt-4"><span>Simpan</span></button>
         </form>
       </div>
     </div>
 
-    <!-- VIEW: CEK / KARTU MEMBER -->
+    <!-- VIEW: CEK / STATISTIK INDIVIDU -->
     <div id="check-view" class="hidden">
-      <button onclick="switchView('menu')" class="mb-4 text-gray-500 hover:text-pink-600 flex items-center gap-1 text-sm font-medium"><i class="fas fa-arrow-left"></i> Kembali ke Menu</button>
+      <button onclick="switchView('menu')" class="mb-4 text-gray-500 hover:text-pink-600 flex items-center gap-1 text-sm font-medium"><i class="fas fa-arrow-left"></i> Kembali</button>
       
-      <!-- Search Box -->
       <div class="bg-white p-5 rounded-xl shadow mb-5">
-        <label class="block text-xs font-bold text-gray-500 mb-2 uppercase">Cari Data Member</label>
         <div class="flex gap-2">
-          <div class="relative flex-1">
-             <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
-             <input type="text" id="search-input" placeholder="Ketik RME atau Nama..." class="w-full pl-9 bg-gray-50 border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-400">
-          </div>
-          <button onclick="handleSearch()" class="bg-pink-600 text-white px-5 rounded-lg hover:bg-pink-700 shadow-md transition-colors">Cari</button>
+          <input type="text" id="search-input" placeholder="Ketik RME atau Nama..." class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-400">
+          <button onclick="handleSearch()" class="bg-pink-600 text-white px-5 rounded-lg shadow-md">Cari</button>
         </div>
       </div>
 
-      <!-- Card Result -->
-      <div id="card-result" class="hidden animate-fade-in">
+      <div id="card-result" class="hidden animate-fade-in space-y-6">
         
-        <!-- The Card -->
-        <div id="digital-card" class="relative overflow-hidden rounded-2xl shadow-2xl aspect-[1.58/1] text-white p-6 flex flex-col justify-between mb-5 card-gradient">
-          <div class="absolute top-0 right-0 -mr-10 -mt-10 w-48 h-48 bg-white opacity-10 rounded-full blur-3xl"></div>
-          <div class="absolute bottom-0 left-0 -ml-10 -mb-10 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
-          
-          <div class="flex justify-between items-start z-10">
-            <div>
-              <p class="text-[10px] tracking-[0.2em] uppercase opacity-90 font-semibold">Member Card</p>
-              <h3 class="font-bold text-lg drop-shadow-sm">Klinik Nabilah Pulungan</h3>
-            </div>
-            <div class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <i class="fas fa-heart text-white"></i>
-            </div>
-          </div>
-
-          <div class="z-10 flex justify-between items-end">
-            <div>
-              <p class="text-[10px] opacity-80 mb-0.5">Nama Ibu</p>
-              <h2 id="card-name" class="text-lg font-bold tracking-wide truncate max-w-[160px] drop-shadow-md">Nama Member</h2>
-              
-              <div class="flex gap-3 mt-2">
-                 <div>
-                    <p class="text-[9px] opacity-70">RME</p>
-                    <p id="card-rme" class="text-xs font-mono font-bold">NBLH-XXX</p>
-                 </div>
-                 <div id="card-child-info" class="hidden">
-                    <p class="text-[9px] opacity-70">Anak</p>
-                    <p id="card-child-name" class="text-xs font-bold truncate max-w-[80px]">-</p>
-                 </div>
+        <!-- Digital Card -->
+        <div id="digital-card" class="relative overflow-hidden rounded-2xl shadow-2xl aspect-[1.58/1] text-white p-6 flex flex-col justify-between card-gradient">
+           <div class="flex justify-between items-start z-10">
+              <div><p class="text-[10px] tracking-[0.2em] uppercase opacity-90 font-semibold">Member Card</p><h3 class="font-bold text-lg">Klinik Nabilah</h3></div>
+              <div class="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm"><i class="fas fa-heart text-white"></i></div>
+           </div>
+           <div class="z-10 flex justify-between items-end">
+              <div>
+                <p class="text-[10px] opacity-80 mb-0.5">Nama Ibu</p><h2 id="card-name" class="text-lg font-bold tracking-wide truncate max-w-[160px]">Nama</h2>
+                <div class="flex gap-3 mt-2"><div><p class="text-[9px] opacity-70">RME</p><p id="card-rme" class="text-xs font-mono font-bold">NBLH-XXX</p></div></div>
               </div>
-            </div>
-            
-            <div class="bg-white p-1.5 rounded-xl shadow-lg">
-              <div id="qrcode"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Info & Stats -->
-        <div class="grid grid-cols-2 gap-3 mb-5">
-          <div class="bg-white p-3 rounded-xl shadow border-l-4 border-pink-500">
-            <p class="text-xs text-gray-500 mb-1">Total Kunjungan</p>
-            <p id="info-visits" class="text-2xl font-bold text-gray-800">0</p>
-          </div>
-          <div class="bg-white p-3 rounded-xl shadow border-l-4 border-blue-500">
-            <p class="text-xs text-gray-500 mb-1">Usia Anak</p>
-            <p id="info-age" class="text-sm font-bold text-gray-800 mt-1.5">-</p>
-          </div>
+              <div class="bg-white p-1.5 rounded-xl shadow-lg"><div id="qrcode"></div></div>
+           </div>
         </div>
         
-        <!-- Detail Info List -->
-        <div class="bg-white rounded-xl shadow p-4 mb-5 text-sm space-y-2">
-           <div class="flex justify-between border-b border-gray-100 pb-2">
-              <span class="text-gray-500">WhatsApp</span>
-              <span id="info-wa" class="font-medium text-right">-</span>
+        <!-- TOMBOL CATAT KUNJUNGAN (BARU) -->
+        <button onclick="showVisitModal()" class="w-full bg-gradient-to-r from-pink-500 to-red-500 text-white py-3 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2 transform transition hover:scale-105">
+            <i class="fas fa-plus-circle text-lg"></i> CATAT KUNJUNGAN HARI INI
+        </button>
+
+        <!-- STATISTIK INDIVIDU -->
+        <div>
+           <h3 class="font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fas fa-chart-pie text-pink-500"></i> Statistik Kunjungan</h3>
+           <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="bg-purple-100 p-3 rounded-xl text-center">
+                 <p class="text-[10px] text-purple-600 uppercase font-bold">Pekan Ini</p>
+                 <p id="stat-week" class="text-2xl font-bold text-purple-700">0</p>
+              </div>
+              <div class="bg-green-100 p-3 rounded-xl text-center">
+                 <p class="text-[10px] text-green-600 uppercase font-bold">Bulan Ini</p>
+                 <p id="stat-month" class="text-2xl font-bold text-green-700">0</p>
+              </div>
+              <div class="bg-blue-100 p-3 rounded-xl text-center">
+                 <p class="text-[10px] text-blue-600 uppercase font-bold">Tahun Ini</p>
+                 <p id="stat-year" class="text-2xl font-bold text-blue-700">0</p>
+              </div>
+              <div class="bg-pink-100 p-3 rounded-xl text-center border-2 border-pink-200">
+                 <p class="text-[10px] text-pink-600 uppercase font-bold">Total</p>
+                 <p id="stat-total" class="text-2xl font-bold text-pink-700">0</p>
+              </div>
            </div>
-           <div class="flex justify-between border-b border-gray-100 pb-2">
-              <span class="text-gray-500">Instagram</span>
-              <span id="info-ig" class="font-medium text-right">-</span>
-           </div>
-           <div class="flex justify-between">
-              <span class="text-gray-500">Domisili</span>
-              <span id="info-alamat" class="font-medium text-right max-w-[150px] truncate">-</span>
+           
+           <div class="bg-white p-3 rounded-xl shadow">
+               <p class="text-xs text-center text-gray-500 mb-2">Tren Kunjungan</p>
+               <canvas id="individualChart" height="150"></canvas>
            </div>
         </div>
-
-        <button onclick="downloadCard()" class="w-full bg-gray-800 text-white py-3.5 rounded-xl font-bold shadow hover:bg-gray-900 flex justify-center items-center gap-2 transition-transform hover:scale-[1.02]">
-          <i class="fas fa-download"></i> Simpan Kartu ke Galeri
-        </button>
+        
+        <button onclick="downloadCard()" class="w-full bg-gray-800 text-white py-3 rounded-xl font-bold shadow flex justify-center items-center gap-2"><i class="fas fa-download"></i> Simpan Kartu</button>
       </div>
-
     </div>
 
+    <!-- VIEW: ANALISA GLOBAL -->
+    <div id="analysis-view" class="hidden">
+       <button onclick="switchView('menu')" class="mb-4 text-gray-500 hover:text-pink-600 flex items-center gap-1 text-sm font-medium"><i class="fas fa-arrow-left"></i> Kembali</button>
+       
+       <h2 class="text-xl font-bold text-pink-600 mb-4">Analisa & Promo</h2>
+       
+       <div class="bg-white p-4 rounded-xl shadow mb-6">
+           <h3 class="font-bold text-sm text-gray-700 mb-4">Tren Kunjungan Klinik (6 Bulan)</h3>
+           <canvas id="globalChart" height="200"></canvas>
+       </div>
+
+       <div class="bg-white p-4 rounded-xl shadow">
+           <h3 class="font-bold text-sm text-gray-700 mb-2 flex justify-between items-center">
+               <span>🏆 Top 10 Loyal Member</span>
+               <span class="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">Untuk Promo</span>
+           </h3>
+           <p class="text-[10px] text-gray-400 mb-4">Member dengan kunjungan terbanyak berhak mendapatkan apresiasi.</p>
+           
+           <div id="top-member-list" class="space-y-3">
+               <div class="text-center py-4"><div class="loader inline-block"></div> Memuat...</div>
+           </div>
+       </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL CATAT KUNJUNGAN -->
+  <div id="visit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
+      <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">Catat Kunjungan Baru</h3>
+          <p class="text-sm text-gray-500 mb-4">Kunjungan akan ditambahkan ke statistik member ini.</p>
+          
+          <input type="hidden" id="visit-rme">
+          <input type="hidden" id="visit-nama">
+
+          <div class="mb-4">
+              <label class="block text-xs font-bold text-gray-600 mb-1">Catatan / Tindakan (Opsional)</label>
+              <input type="text" id="visit-notes" placeholder="Contoh: Baby Spa, Imunisasi" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3">
+          </div>
+
+          <div class="flex gap-3">
+              <button onclick="document.getElementById('visit-modal').classList.add('hidden')" class="flex-1 py-3 text-gray-500 font-bold bg-gray-100 rounded-xl">Batal</button>
+              <button onclick="confirmVisit()" class="flex-1 py-3 text-white font-bold bg-pink-600 rounded-xl shadow-lg hover:bg-pink-700">Simpan</button>
+          </div>
+      </div>
   </div>
 
   <div id="toast" class="fixed top-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow-lg transform translate-x-full transition-transform z-50 text-sm font-medium"></div>
 
   <script>
-    // --- GANTI URL INI DENGAN DEPLOYMENT BARU ---
+    // --- GANTI URL INI ---
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwBTuJjCTbPNtZECZWiIGqSXhazhvuP8VMGKl0g9P98IW4N594X-FvvtTZOMRqJT3bNw/exec'; 
 
+    let individualChartInstance = null;
+    let globalChartInstance = null;
+
     function switchView(viewName) {
-      ['menu-view', 'register-view', 'check-view'].forEach(id => {
+      ['menu-view', 'register-view', 'check-view', 'analysis-view'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
-      const view = document.getElementById(viewName + '-view');
-      view.classList.remove('hidden');
+      document.getElementById(viewName + '-view').classList.remove('hidden');
       if(viewName === 'menu') loadRecentMembers();
     }
 
-    // --- KALKULATOR USIA ---
-    function hitungUsia() {
-        const tgl = document.getElementById('tgl_lahir').value;
-        const display = document.getElementById('usia_display');
-        
-        if(!tgl) {
-            display.value = '';
-            return;
-        }
-
-        const dob = new Date(tgl);
-        const now = new Date();
-        
-        let years = now.getFullYear() - dob.getFullYear();
-        let months = now.getMonth() - dob.getMonth();
-        let days = now.getDate() - dob.getDate();
-
-        if (days < 0) {
-            months--;
-            days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-        }
-        if (months < 0) {
-            years--;
-            months += 12;
-        }
-
-        display.value = `${years} Tahun, ${months} Bulan, ${days} Hari`;
-    }
-
-    // --- REGISTRASI ---
-    async function handleRegister(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btn-submit');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<div class="loader"></div> Menyimpan...';
-      btn.disabled = true;
-
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData.entries());
-
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'registerMember', payload: data })
-        });
-        const json = await res.json();
-        
-        if (json.status === 'success') {
-          showToast('Member berhasil didaftarkan!', 'success');
-          e.target.reset();
-          document.getElementById('usia_display').value = ''; 
-          switchView('menu');
-        } else {
-          showToast(json.message, 'error');
-        }
-      } catch (err) {
-        showToast('Gagal menghubungi server', 'error');
-      } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-      }
-    }
-
-    // --- SEARCH / CEK MEMBER ---
+    // --- SEARCH & INDIVIDUAL STATS ---
     async function handleSearch() {
       const q = document.getElementById('search-input').value;
       if (!q) return showToast('Masukkan kata kunci!', 'error');
       
       const btn = document.querySelector('button[onclick="handleSearch()"]');
-      const originalText = btn.innerText;
-      btn.innerText = '...';
-      btn.disabled = true;
+      const originalText = btn.innerText; btn.innerText = '...'; btn.disabled = true;
 
-      const cardResult = document.getElementById('card-result');
-      cardResult.classList.add('hidden');
+      document.getElementById('card-result').classList.add('hidden');
       
       try {
         const res = await fetch(SCRIPT_URL, {
@@ -318,104 +241,155 @@
         const json = await res.json();
 
         if (json.status === 'success') {
-          renderCard(json.data);
-          cardResult.classList.remove('hidden');
+          renderIndividualStats(json.data);
+          document.getElementById('card-result').classList.remove('hidden');
         } else {
           showToast(json.message, 'error');
         }
       } catch (err) {
         showToast('Gagal mencari data', 'error');
       } finally {
-        btn.innerText = originalText;
-        btn.disabled = false;
+        btn.innerText = originalText; btn.disabled = false;
       }
     }
 
-    function renderCard(data) {
-      document.getElementById('card-name').textContent = data.Nama_Ibu;
-      document.getElementById('card-rme').textContent = data.RME;
-      document.getElementById('info-visits').textContent = data.totalVisits || 0;
-      
-      document.getElementById('info-wa').textContent = data.WhatsApp || '-';
-      document.getElementById('info-ig').textContent = data.Instagram || '-';
-      document.getElementById('info-alamat').textContent = data.Alamat || '-';
-      document.getElementById('info-age').textContent = data.usiaAnak || '-';
+    function renderIndividualStats(data) {
+        // Data untuk Modal Visit
+        document.getElementById('visit-rme').value = data.RME;
+        document.getElementById('visit-nama').value = data.Nama_Ibu;
 
-      const childInfo = document.getElementById('card-child-info');
-      const childName = document.getElementById('card-child-name');
-      if(data.Nama_Anak && data.Nama_Anak !== '-') {
-         childInfo.classList.remove('hidden');
-         childName.textContent = data.Nama_Anak;
-      } else {
-         childInfo.classList.add('hidden');
-      }
-
-      const qrContainer = document.getElementById('qrcode');
-      qrContainer.innerHTML = '';
-      new QRCode(qrContainer, {
-        text: data.Member_ID,
-        width: 60,
-        height: 60,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-      });
-    }
-
-    // --- RECENT MEMBERS ---
-    async function loadRecentMembers() {
-      const list = document.getElementById('recent-members-list');
-      list.innerHTML = '<div class="text-center text-gray-400 py-4"><div class="loader inline-block"></div> Memuat data...</div>';
-      try {
-        const res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'getAllMembers' })
-        });
-        const json = await res.json();
+        document.getElementById('card-name').textContent = data.Nama_Ibu;
+        document.getElementById('card-rme').textContent = data.RME;
         
-        if (json.status === 'success' && json.data.length > 0) {
-          list.innerHTML = json.data.map(m => `
-            <div class="flex justify-between items-center p-3 hover:bg-pink-50 rounded-lg border border-gray-100 transition-colors">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center font-bold text-xs">${String(m.Nama_Ibu).charAt(0)}</div>
-                <div>
-                    <p class="font-bold text-gray-700">${m.Nama_Ibu}</p>
-                    <p class="text-[10px] text-gray-400 font-mono">${m.RME}</p>
-                </div>
-              </div>
-              <div class="text-right">
-                 ${m.Nama_Anak && m.Nama_Anak !== '-' ? `<p class="text-xs text-gray-500"><i class="fas fa-baby"></i> ${m.Nama_Anak}</p>` : ''}
-              </div>
-            </div>
-          `).join('');
-        } else {
-          list.innerHTML = '<p class="text-center text-gray-400 py-4 text-xs">Belum ada member terdaftar</p>';
+        const s = data.stats;
+        document.getElementById('stat-week').textContent = s.week;
+        document.getElementById('stat-month').textContent = s.month;
+        document.getElementById('stat-year').textContent = s.year;
+        document.getElementById('stat-total').textContent = s.total;
+
+        const qr = document.getElementById('qrcode'); qr.innerHTML = '';
+        new QRCode(qr, { text: data.Member_ID, width: 60, height: 60 });
+
+        const ctx = document.getElementById('individualChart').getContext('2d');
+        if(individualChartInstance) individualChartInstance.destroy();
+        
+        individualChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Object.keys(s.chartData).sort(),
+                datasets: [{
+                    label: 'Kunjungan',
+                    data: Object.values(s.chartData),
+                    borderColor: '#FF6B8A',
+                    backgroundColor: 'rgba(255, 107, 138, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, plugins: { legend: {display: false} } }
+        });
+    }
+
+    // --- VISIT RECORDING LOGIC ---
+    function showVisitModal() {
+        document.getElementById('visit-notes').value = '';
+        document.getElementById('visit-modal').classList.remove('hidden');
+    }
+
+    async function confirmVisit() {
+        const rme = document.getElementById('visit-rme').value;
+        const nama = document.getElementById('visit-nama').value;
+        const notes = document.getElementById('visit-notes').value;
+        const modal = document.getElementById('visit-modal');
+        const btn = modal.querySelector('button[onclick="confirmVisit()"]');
+
+        btn.disabled = true; btn.innerText = 'Menyimpan...';
+
+        try {
+            const res = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    action: 'recordVisit', 
+                    payload: { rme, nama, notes } 
+                })
+            });
+            const json = await res.json();
+            
+            if(json.status === 'success') {
+                showToast('Kunjungan Berhasil Dicatat!', 'success');
+                modal.classList.add('hidden');
+                // Refresh data statistik otomatis
+                document.getElementById('search-input').value = rme;
+                handleSearch();
+            } else {
+                showToast(json.message, 'error');
+            }
+        } catch(e) {
+            showToast('Gagal koneksi', 'error');
+        } finally {
+            btn.disabled = false; btn.innerText = 'Simpan';
         }
-      } catch (err) {
-        list.innerHTML = '<p class="text-center text-red-400 py-4 text-xs">Gagal memuat data</p>';
-      }
+    }
+
+    // --- GLOBAL ANALYTICS ---
+    async function loadAnalytics() {
+        switchView('analysis');
+        const list = document.getElementById('top-member-list');
+        
+        try {
+            const res = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'getGlobalAnalytics' })
+            });
+            const json = await res.json();
+            
+            if(json.status === 'success') {
+                const d = json.data;
+                list.innerHTML = d.topMembers.map((m, i) => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full ${i<3 ? 'bg-yellow-400 text-white' : 'bg-gray-200 text-gray-600'} flex items-center justify-center font-bold text-xs">${i+1}</div>
+                            <div>
+                                <p class="font-bold text-sm text-gray-800">${m.nama}</p>
+                                <p class="text-[10px] text-gray-500 font-mono">${m.rme} • ${m.hp}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-pink-600">${m.visits} x</p>
+                            <p class="text-[9px] text-gray-400">Total Kunjungan</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                const ctx = document.getElementById('globalChart').getContext('2d');
+                if(globalChartInstance) globalChartInstance.destroy();
+
+                globalChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(d.globalTrend).sort(),
+                        datasets: [{
+                            label: 'Total Kunjungan',
+                            data: Object.values(d.globalTrend),
+                            backgroundColor: '#60A5FA',
+                            borderRadius: 5
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: {display: false} } }
+                });
+            }
+        } catch(e) {
+            list.innerHTML = '<p class="text-red-500 text-center">Gagal memuat data</p>';
+        }
     }
 
     // --- UTILS ---
-    function showToast(msg, type) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = `fixed top-4 right-4 px-4 py-2 rounded shadow-lg transform translate-x-full transition-transform z-50 text-white ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
-      t.classList.remove('translate-x-full');
-      setTimeout(() => t.classList.add('translate-x-full'), 3000);
-    }
+    function hitungUsia() { /* ... kode lama ... */ const tgl=document.getElementById('tgl_lahir').value; if(tgl){ const d=new Date(tgl); const n=new Date(); let y=n.getFullYear()-d.getFullYear(); document.getElementById('usia_display').value = y + " Tahun"; } }
+    async function handleRegister(e) { e.preventDefault(); const f=new FormData(e.target); const d=Object.fromEntries(f.entries()); const btn=document.getElementById('btn-submit'); btn.disabled=true; btn.innerHTML='Menyimpan...'; try{await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'registerMember',payload:d})}); showToast('Sukses','success'); e.target.reset(); switchView('menu');}catch(e){showToast('Error','error');} finally{btn.disabled=false; btn.innerHTML='Simpan';} }
+    async function loadRecentMembers() { try { const res = await fetch(SCRIPT_URL, {method:'POST',body:JSON.stringify({action:'getAllMembers'})}); const j = await res.json(); document.getElementById('recent-members-list').innerHTML = j.data.slice(0,10).map(m=>`<div class="p-2 border-b text-xs flex justify-between"><span><b>${m.Nama_Ibu}</b></span><span class="text-gray-400">${m.RME}</span></div>`).join(''); } catch(e){} }
+    function showToast(msg, type) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('translate-x-full'); setTimeout(()=>t.classList.add('translate-x-full'),3000); }
+    function downloadCard() { const c=document.getElementById('digital-card'); html2canvas(c,{scale:3}).then(cv=>{const l=document.createElement('a'); l.download='Member.png'; l.href=cv.toDataURL(); l.click();}); }
 
-    function downloadCard() {
-      const card = document.getElementById('digital-card');
-      html2canvas(card, { scale: 3, backgroundColor: null }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `MemberCard-${document.getElementById('card-name').textContent.replace(/\s+/g,'_')}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    }
-
-    // Init
     loadRecentMembers();
   </script>
 </body>
